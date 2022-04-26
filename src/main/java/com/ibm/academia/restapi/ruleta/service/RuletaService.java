@@ -6,10 +6,13 @@ import java.util.Optional;
 import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ibm.academia.restapi.ruleta.entidad.Ruleta;
+import com.ibm.academia.restapi.ruleta.modelo.RuletaResponse;
 import com.ibm.academia.restapi.ruleta.repositorio.RuletaRepository;
 
 @Service
@@ -30,7 +33,8 @@ public class RuletaService
 		save(ruleta);
 		
 	}
-	public Boolean apertura(long id)
+	
+	public ResponseEntity<?> apertura(long id)
 	{
 		Ruleta ruletaObj = new Ruleta();
 		if(existsById(id))
@@ -45,13 +49,15 @@ public class RuletaService
 			save(ruletaObj);
 		} 
 		else {
-			return false;
+			return new ResponseEntity<>("No se encontro la ruleta",HttpStatus.BAD_REQUEST);
 		}
-		return true;
+		return new ResponseEntity<>("Se abrio la Ruleta con id: " + id,HttpStatus.OK);
 	}
-	public Ruleta cerrar(long id) 
+	
+	public ResponseEntity<?> cerrar(long id) 
 	{
 		Ruleta ruletaObj = new Ruleta();
+		RuletaResponse ruletaResponse = new RuletaResponse();
 		if(existsById(id))
 		{
 			Optional<Ruleta> ruletaOptinal = findById(id);
@@ -61,51 +67,82 @@ public class RuletaService
 				ruletaObj.setEstado(false);
 			
 			}
+			ruletaResponse.setId(ruletaObj.getId());
+			ruletaResponse.setEstado(ruletaObj.getEstado());
+			ruletaResponse.setGanancias(ruletaObj.getGanacia());
 			save(ruletaObj);
 		} 
 		else {
-			return null;
+			return new ResponseEntity<>("No se encontro la ruleta",HttpStatus.BAD_REQUEST);
 		}
-		return ruletaObj;
+		return new ResponseEntity<>(ruletaResponse,HttpStatus.OK);
+	}
+	
+public ResponseEntity<?>jugar (Ruleta ruleta,Double apuesta,String color,Integer numero)
+	{
+		
+        if(ruleta.getEstado()==false) {
+			
+			return new ResponseEntity<>("No se puede jugar en una mesa fuera de servicio",HttpStatus.BAD_REQUEST);
+		}
+		
+		if(color.isBlank() && numero!=null)
+		{
+			
+			return new ResponseEntity<>("Solo puede elegir color o Numero",HttpStatus.BAD_REQUEST);
+		}
+		
+		if(!color.isBlank()&&apuesta<=10000)
+		{
+		    return apuestaColor(ruleta, color, apuesta);
+					
+				
+		}
+
+				
+		if (numero!=null && apuesta<=10000)
+		{
+			return apuestaNumero(ruleta, numero, apuesta);
+		}
+					
+		return new ResponseEntity<>("Datos ingresado invalidos",HttpStatus.BAD_REQUEST);		
+		
 	}
 	
 	
 	
-	
-	public Ruleta apuestaColor(Ruleta ru,String color,Double apuesta)
+	public ResponseEntity<?> apuestaColor(Ruleta ru,String color,Double apuesta)
 	{
 		Random ran = new Random ();
 		int resultado = ran.nextInt(36 + 0) + 0;
-			if(color.compareToIgnoreCase("rojo")<=0)
+			if(color.compareToIgnoreCase("rojo")==0)
 			{
 				if(resultado>=0 && resultado<=18)
 				{
-					ru.setUltimoGanador(true);
+					return new ResponseEntity<>("Ganaste: "+ apuesta*2,HttpStatus.OK);
 				}else {
-					ru.setUltimoGanador(false);
 					ru.setGanacia(apuesta+ru.getGanacia());
+					return new ResponseEntity<>("Perdiste",HttpStatus.OK);
 					
 				}
-				save(ru);
-				return ru;
+				
 				
 			}
-			if(color.compareToIgnoreCase("negro")<=0)
+			if(color.compareToIgnoreCase("negro")==0)
 			{
 				if(resultado>=19 && resultado<=36)
 				{
-					ru.setUltimoGanador(true);
+					return new ResponseEntity<>("Ganaste: "+ apuesta*2,HttpStatus.OK);
 				}else {
-					ru.setUltimoGanador(false);
 					ru.setGanacia(apuesta+ru.getGanacia());
+					return new ResponseEntity<>("Perdiste"+ apuesta*2,HttpStatus.OK);
 				}
-				save(ru);
-				return ru;
 			}
-		return null;
+	   return new ResponseEntity<>("Datos ingresado invalidos",HttpStatus.BAD_REQUEST);
 		
 	}
-	public Ruleta apuestaNumero(Ruleta ru, Integer numero, Double apuesta) 
+	
+	public ResponseEntity<?> apuestaNumero(Ruleta ru, Integer numero, Double apuesta) 
 	{
 		Random ran = new Random ();
 		int resultado = ran.nextInt(36 + 0) + 0;
@@ -113,16 +150,15 @@ public class RuletaService
 		{
 		if(resultado==numero)	
 		   {
-			  ru.setUltimoGanador(true);
+			return new ResponseEntity<>("Ganaste: "+ apuesta*2,HttpStatus.OK);
 		   }else {
-			   ru.setUltimoGanador(false);
+			   
 			   ru.setGanacia(apuesta+ru.getGanacia());
+			   return new ResponseEntity<>("Perdiste",HttpStatus.OK);
 			   
 		   }
-		save(ru);
-		return ru;
 		}
-		return null;
+		return new ResponseEntity<>("Datos ingresado invalidos",HttpStatus.BAD_REQUEST);
 	}
 	
 	public List<Ruleta> list()
