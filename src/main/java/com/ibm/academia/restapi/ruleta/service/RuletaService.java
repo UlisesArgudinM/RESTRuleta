@@ -25,16 +25,17 @@ public class RuletaService
 	
 	
 	
-	public void crearRuleta()
+public void crearRuleta()
 	{
 		Ruleta ruleta = new Ruleta();
 		ruleta.setEstado(true);
+		ruleta.setAutor("Ulises");
 		ruleta.setGanacia(0.0);
 		save(ruleta);
 		
 	}
 	
-	public ResponseEntity<?> apertura(long id)
+public ResponseEntity<?> apertura(long id)
 	{
 		Ruleta ruletaObj = new Ruleta();
 		if(existsById(id))
@@ -54,7 +55,7 @@ public class RuletaService
 		return new ResponseEntity<>("Se abrio la Ruleta con id: " + id,HttpStatus.OK);
 	}
 	
-	public ResponseEntity<?> cerrar(long id) 
+public ResponseEntity<?> cerrar(long id) 
 	{
 		Ruleta ruletaObj = new Ruleta();
 		RuletaResponse ruletaResponse = new RuletaResponse();
@@ -77,7 +78,7 @@ public class RuletaService
 		}
 		return new ResponseEntity<>(ruletaResponse,HttpStatus.OK);
 	}
-	
+
 public ResponseEntity<?>jugar (Ruleta ruleta,Double apuesta,String color,Integer numero)
 	{
 		
@@ -110,8 +111,8 @@ public ResponseEntity<?>jugar (Ruleta ruleta,Double apuesta,String color,Integer
 	}
 	
 	
-	
-	public ResponseEntity<?> apuestaColor(Ruleta ru,String color,Double apuesta)
+
+public ResponseEntity<?> apuestaColor(Ruleta ru,String color,Double apuesta)
 	{
 		Random ran = new Random ();
 		int resultado = ran.nextInt(36 + 0) + 0;
@@ -142,7 +143,8 @@ public ResponseEntity<?>jugar (Ruleta ruleta,Double apuesta,String color,Integer
 		
 	}
 	
-	public ResponseEntity<?> apuestaNumero(Ruleta ru, Integer numero, Double apuesta) 
+
+public ResponseEntity<?> apuestaNumero(Ruleta ru, Integer numero, Double apuesta) 
 	{
 		Random ran = new Random ();
 		int resultado = ran.nextInt(36 + 0) + 0;
@@ -161,25 +163,32 @@ public ResponseEntity<?>jugar (Ruleta ruleta,Double apuesta,String color,Integer
 		return new ResponseEntity<>("Datos ingresado invalidos",HttpStatus.BAD_REQUEST);
 	}
 	
+
+	@Transactional(readOnly = true)
 	public List<Ruleta> list()
 	{
         return ruletaRepository.findAll();
     }
+	
+	@Transactional(readOnly = true)
 	public Optional<Ruleta>findById(long id)
 	{
 		return ruletaRepository.findById(id);
 	}
 	
+
 	public void save(Ruleta ruleta)
 	{
 		ruletaRepository.save(ruleta);
 	}
 	
+
 	public void delete (long id)
 	{
 		ruletaRepository.deleteById(id);
 	}
 	
+	@Transactional(readOnly = true)
 	public boolean existsById(long id)
 	{
         return ruletaRepository.existsById(id);

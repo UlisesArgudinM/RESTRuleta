@@ -49,7 +49,7 @@ public class RuletaController
 	
 	/** Endpoint que cambia el estado de la ruleta a true
 	 * @param Id Parametro que ingresa la ip en un body
-	 * @return retorna un mensaje en donde dice si el cambio fue efectuado o no la ruleta
+	 * @return retorna un mensaje en donde dice si el cambio fue efectuado o no la ruleta a abierto
 	 * @author Usuario 24/04/22*/
 	
 	@PutMapping("/apertura")
@@ -62,7 +62,7 @@ public class RuletaController
 	
 	/** Endpoint que cambia el estado de la ruleta a false
 	 * @param Id Parametro que ingresa la ip en un body
-	 * @return retorna la informacion de la ruleta 
+	 * @return retorna la informacion de la ruleta de la cual quiere cerrar
 	 * @author Usuario 24/04/22*/
 	
 	@PutMapping("/cerrar")
@@ -74,7 +74,7 @@ public class RuletaController
 	}
 	
 	/** Endpoind que lista todas la ruletas en la base de datos
-	 * @return retorna una lista de tipo Ruleta
+	 * @return retorna la lista de todas la ruletas
 	 * @author Usuario 24/04/22 **/
 	
 	
@@ -89,7 +89,7 @@ public class RuletaController
 	
 	
 	/** Endpoind que lista todas la ruletas en la base de datos
-	 * @return retorna una lista de tipo Ruleta
+	 * @return retorna si gano o perdio contra la ruleta
 	 * @author Usuario 24/04/22 **/
 	
 	@PutMapping("/apostar")

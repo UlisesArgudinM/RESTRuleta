@@ -37,8 +37,8 @@ public class Ruleta implements Serializable
 	@Column(name = "Estado")
 	private Boolean estado;
 	
-	@Column(name = "UlitimoGanador")
-	private Boolean ultimoGanador;
+	@Column(name = "Autor")
+	private String autor;
 	
 	@Column (name = "fechaCreacion", nullable = false)
 	private Date fechaCreacion;
