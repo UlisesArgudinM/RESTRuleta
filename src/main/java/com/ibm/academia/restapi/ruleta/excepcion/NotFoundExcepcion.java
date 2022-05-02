@@ -1,8 +1,8 @@
 package com.ibm.academia.restapi.ruleta.excepcion;
 
-public class NotFoundException extends RuntimeException 
+public class NotFoundExcepcion extends RuntimeException 
 {
-	public NotFoundException(String mensaje)
+	public NotFoundExcepcion(String mensaje)
 	{
 		super(mensaje);
 	}

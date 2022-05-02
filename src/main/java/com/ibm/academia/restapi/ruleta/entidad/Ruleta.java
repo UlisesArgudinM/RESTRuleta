@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "Ruletas")
+@Table(name = "ruletas",schema = "Casino")
 @Setter
 @Getter
 @NoArgsConstructor
@@ -42,13 +42,20 @@ public class Ruleta implements Serializable
 	
 	@Column (name = "fechaCreacion", nullable = false)
 	private Date fechaCreacion;
-	 
-	
+
 	
 	@PrePersist
 	private void antesPersistir()
 	{
 		this.fechaCreacion = new Date();
+	}
+
+	public Ruleta(long id, Double ganacia, Boolean estado, String autor) {
+		super();
+		this.id = id;
+		this.ganacia = ganacia;
+		this.estado = estado;
+		this.autor = autor;
 	}
 
 	private static final long serialVersionUID = -5413128261886649018L;

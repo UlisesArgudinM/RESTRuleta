@@ -1,7 +1,6 @@
 package com.ibm.academia.restapi.ruleta.controller;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.validation.Valid;
@@ -18,29 +17,30 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ibm.academia.restapi.ruleta.entidad.Ruleta;
-import com.ibm.academia.restapi.ruleta.excepcion.NotFoundException;
+import com.ibm.academia.restapi.ruleta.excepcion.BadRequestException;
+import com.ibm.academia.restapi.ruleta.excepcion.NotFoundExcepcion;
 import com.ibm.academia.restapi.ruleta.modelo.Id;
 import com.ibm.academia.restapi.ruleta.modelo.RuletaRequest;
 import com.ibm.academia.restapi.ruleta.modelo.dto.RuletaDTO;
 import com.ibm.academia.restapi.ruleta.modelo.mapper.RuletaMapper;
-import com.ibm.academia.restapi.ruleta.service.RuletaService;
+import com.ibm.academia.restapi.ruleta.service.IRuletaService;
 
-import lombok.extern.slf4j.Slf4j;
 
 @RestController 
 @RequestMapping("/casino")
 @CrossOrigin(origins = "*")
-@Slf4j
+
 public class RuletaController 
 {
-	@Autowired
-	private RuletaService ruletaService;
+	
+	@Autowired 
+	private IRuletaService ruletaService;
 	
 	
 	/**Enpoint que crear una ruleta 
 	 * @author Usuario 24/04/22**/
 	
-	@PostMapping("/crear")
+	@PutMapping("/crear")
 	public ResponseEntity<?>save()
 	{
 		ruletaService.crearRuleta();
@@ -90,20 +90,19 @@ public class RuletaController
 	
 	/** Endpoind que lista todas la ruletas en la base de datos
 	 * @return retorna si gano o perdio contra la ruleta
-	 * @author Usuario 24/04/22 **/
+	 * @author Usuario 24/04/22 
+	 * @throws NotFoundExcepcion **/
 	
-	@PutMapping("/apostar")
-	public ResponseEntity<?>apostar(@RequestBody @Valid RuletaRequest ruletaRequest,BindingResult resultado)
+	@PostMapping("/apostar")
+	public ResponseEntity<?>apostar(@Valid @RequestBody RuletaRequest ruletaRequest,BindingResult resultado) throws Exception
 	{
-		log.info("Por favor de ingresar el tipo de apuesta e id de la ruleta en sus respectivos espacios");
-		log.info("Puede solo apostar a un numero o a un color de igual manera debe ser una apuesta menor de 10000 Dolares");
 		
-		if(resultado.hasFieldErrors()) {
-		throw new NotFoundException("El cuerpo de la peticion no es valido");
+		if(resultado.hasErrors()) {
+		throw new BadRequestException("El cuerpo de la peticion no es valido");
 		}
-		Optional<Ruleta> ruOp = ruletaService.findById(ruletaRequest.getId());
-		Ruleta ruleta = ruOp.get();
-		return ruletaService.jugar(ruleta, ruletaRequest.getApuesta(), ruletaRequest.getColor(), ruletaRequest.getNumero());
+		Ruleta ruOp = ruletaService.findById(ruletaRequest.getId()).orElseThrow(() -> new NotFoundExcepcion("Datos no encontrados en base de datos"));
+		
+		return ruletaService.jugar(ruOp, ruletaRequest.getApuesta(), ruletaRequest.getColor(), ruletaRequest.getNumero());
 		
 	}
 	

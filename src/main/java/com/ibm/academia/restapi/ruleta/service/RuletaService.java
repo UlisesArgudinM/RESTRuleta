@@ -12,19 +12,21 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ibm.academia.restapi.ruleta.entidad.Ruleta;
+import com.ibm.academia.restapi.ruleta.excepcion.BadRequestException;
+import com.ibm.academia.restapi.ruleta.excepcion.NotFoundExcepcion;
 import com.ibm.academia.restapi.ruleta.modelo.RuletaResponse;
 import com.ibm.academia.restapi.ruleta.repositorio.RuletaRepository;
 
 @Service
 @Transactional
-public class RuletaService
+public class RuletaService implements IRuletaService
 {
 	
 	@Autowired
 	RuletaRepository ruletaRepository;
 	
 	
-	
+@Override
 public void crearRuleta()
 	{
 		Ruleta ruleta = new Ruleta();
@@ -34,7 +36,7 @@ public void crearRuleta()
 		save(ruleta);
 		
 	}
-	
+@Override	
 public ResponseEntity<?> apertura(long id)
 	{
 		Ruleta ruletaObj = new Ruleta();
@@ -50,11 +52,11 @@ public ResponseEntity<?> apertura(long id)
 			save(ruletaObj);
 		} 
 		else {
-			return new ResponseEntity<>("No se encontro la ruleta",HttpStatus.BAD_REQUEST);
+			throw new NotFoundExcepcion("No se encontro la ruleta");
 		}
 		return new ResponseEntity<>("Se abrio la Ruleta con id: " + id,HttpStatus.OK);
 	}
-	
+@Override
 public ResponseEntity<?> cerrar(long id) 
 	{
 		Ruleta ruletaObj = new Ruleta();
@@ -74,23 +76,23 @@ public ResponseEntity<?> cerrar(long id)
 			save(ruletaObj);
 		} 
 		else {
-			return new ResponseEntity<>("No se encontro la ruleta",HttpStatus.BAD_REQUEST);
+			throw new NotFoundExcepcion("No se encontro la ruleta");
 		}
 		return new ResponseEntity<>(ruletaResponse,HttpStatus.OK);
 	}
-
+@Override
 public ResponseEntity<?>jugar (Ruleta ruleta,Double apuesta,String color,Integer numero)
 	{
 		
         if(ruleta.getEstado()==false) {
 			
-			return new ResponseEntity<>("No se puede jugar en una mesa fuera de servicio",HttpStatus.BAD_REQUEST);
+			throw new BadRequestException("No se puede jugar en una mesa fuera de servicio");
 		}
 		
 		if(color.isBlank() && numero!=null)
 		{
 			
-			return new ResponseEntity<>("Solo puede elegir color o Numero",HttpStatus.BAD_REQUEST);
+			throw new BadRequestException("Solo puede elegir color o Numero");
 		}
 		
 		if(!color.isBlank()&&apuesta<=10000)
@@ -106,12 +108,12 @@ public ResponseEntity<?>jugar (Ruleta ruleta,Double apuesta,String color,Integer
 			return apuestaNumero(ruleta, numero, apuesta);
 		}
 					
-		return new ResponseEntity<>("Datos ingresado invalidos",HttpStatus.BAD_REQUEST);		
+	    throw new BadRequestException("Datos ingresado invalidos");		
 		
 	}
 	
 	
-
+@Override
 public ResponseEntity<?> apuestaColor(Ruleta ru,String color,Double apuesta)
 	{
 		Random ran = new Random ();
@@ -139,11 +141,11 @@ public ResponseEntity<?> apuestaColor(Ruleta ru,String color,Double apuesta)
 					return new ResponseEntity<>("Perdiste"+ apuesta*2,HttpStatus.OK);
 				}
 			}
-	   return new ResponseEntity<>("Datos ingresado invalidos",HttpStatus.BAD_REQUEST);
+	   throw new BadRequestException("Datos ingresado invalidos");
 		
 	}
 	
-
+@Override
 public ResponseEntity<?> apuestaNumero(Ruleta ru, Integer numero, Double apuesta) 
 	{
 		Random ran = new Random ();
@@ -160,16 +162,16 @@ public ResponseEntity<?> apuestaNumero(Ruleta ru, Integer numero, Double apuesta
 			   
 		   }
 		}
-		return new ResponseEntity<>("Datos ingresado invalidos",HttpStatus.BAD_REQUEST);
+		throw new BadRequestException("Datos ingresado invalidos");
 	}
 	
-
+	
 	@Transactional(readOnly = true)
 	public List<Ruleta> list()
 	{
         return ruletaRepository.findAll();
     }
-	
+	@Override
 	@Transactional(readOnly = true)
 	public Optional<Ruleta>findById(long id)
 	{
