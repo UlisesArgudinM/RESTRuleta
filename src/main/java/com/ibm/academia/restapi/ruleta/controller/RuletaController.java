@@ -75,7 +75,7 @@ public class RuletaController
 		List<ApuestaDTO> apuestaDTO = apuestas.stream().map(ApuestaMapper::mapApuesta).collect(Collectors.toList());
 		if(apuestaDTO.isEmpty())
 		{
-			throw new NotFoundExcepcion("no se encontro a ruleta");
+			throw new NotFoundExcepcion("no se encontro a ruleta if");
 		}
 		return new ResponseEntity<List<ApuestaDTO>>(apuestaDTO,HttpStatus.OK);
 		

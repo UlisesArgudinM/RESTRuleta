@@ -3,12 +3,15 @@ package com.ibm.academia.restapi.ruleta.entidad;
 import java.io.Serializable;
 import java.util.Date;
 
-
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
 
@@ -31,8 +34,6 @@ public class Apuesta implements Serializable
 	@Column(name = "Id")
 	private Long id;
 	
-	@Column(name = "id_ruleta")
-	private Long idRuleta;
 	
 	@Column(name= "fecha_Apuesta")
 	private Date fechaApuesta;
@@ -43,8 +44,9 @@ public class Apuesta implements Serializable
 	@Column(name="premio")
 	private Double premio;
 	
-	
-	
+	@ManyToOne(optional = true,cascade = {CascadeType.PERSIST,CascadeType.MERGE})
+	@JoinColumn(name = "ruleta_id", foreignKey = @ForeignKey(name = "FK_RULETA_ID"))
+	private Ruleta ruleta;
 	
 	@PrePersist
 	private void antesPersistir()

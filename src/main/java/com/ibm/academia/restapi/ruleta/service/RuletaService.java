@@ -1,7 +1,6 @@
 package com.ibm.academia.restapi.ruleta.service;
 
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -64,7 +63,6 @@ public ResponseEntity<?> apertura(long id)
 @Override
 public List<Apuesta> cerrar(long id) 
 	{
-	List <Apuesta> apue = new ArrayList<Apuesta>();
 		Ruleta ruletaObj = new Ruleta();
 		if(existsById(id))
 		{
@@ -75,19 +73,13 @@ public List<Apuesta> cerrar(long id)
 				ruletaObj.setEstado(false);
 				
 			}
-			for(Apuesta apuestas : listApuesta())
-			{
-				if(apuestas.getIdRuleta()==id)
-				{
-				apue.add(apuestas);
-				}
-			}
+				
 			save(ruletaObj);
 		} 
 		else {
 			return null;
 		}
-		return apue;
+		return ruletaObj.getApuestas();
 	}
 @Override
 public ResponseEntity<?>jugar (Ruleta ruleta,Double apuesta,String color,Integer numero)
@@ -126,23 +118,23 @@ public ResponseEntity<?>jugar (Ruleta ruleta,Double apuesta,String color,Integer
 public ResponseEntity<?> apuestaColor(Ruleta ru,String color,Double apuesta)
 	{
 		Random ran = new Random ();
-		Apuesta apuestaObj =new Apuesta();
+		Apuesta apuestaObj = new Apuesta();
 		int resultado = ran.nextInt(36 + 0) + 0;
 		
 			if(color.compareToIgnoreCase("rojo")==0)
 			{
 				if(resultado>=0 && resultado<=18)
 				{
-					apuestaObj.setIdRuleta(ru.getId());
 					apuestaObj.setGanador("Visistante");
 					apuestaObj.setPremio(apuesta*2);
+					apuestaObj.setRuleta(ru);
 					save(apuestaObj);
 					return new ResponseEntity<>("Ganaste: "+ apuesta*2,HttpStatus.OK);
 					
 				}else {
-					apuestaObj.setIdRuleta(ru.getId());
 					apuestaObj.setGanador("Casa");
 					apuestaObj.setPremio(apuesta);
+					apuestaObj.setRuleta(ru);
 					save(apuestaObj);
 					ru.setGanacia(apuesta+ru.getGanacia());
 					return new ResponseEntity<>("Perdiste",HttpStatus.OK);
@@ -156,15 +148,15 @@ public ResponseEntity<?> apuestaColor(Ruleta ru,String color,Double apuesta)
 			{
 				if(resultado>=19 && resultado<=36)
 				{
-					apuestaObj.setIdRuleta(ru.getId());
 					apuestaObj.setGanador("Visistante");
 					apuestaObj.setPremio(apuesta*2);
+					apuestaObj.setRuleta(ru);
 					save(apuestaObj);
 					return new ResponseEntity<>("Ganaste: "+ apuesta*2,HttpStatus.OK);
 				}else {
-					apuestaObj.setIdRuleta(ru.getId());
 					apuestaObj.setGanador("Casa");
 					apuestaObj.setPremio(apuesta);
+					apuestaObj.setRuleta(ru);
 					save(apuestaObj);
 					ru.setGanacia(apuesta+ru.getGanacia());
 					return new ResponseEntity<>("Perdiste"+ apuesta*2,HttpStatus.OK);
@@ -184,15 +176,15 @@ public ResponseEntity<?> apuestaNumero(Ruleta ru, Integer numero, Double apuesta
 		{
 		if(resultado==numero)	
 		   {
-			apuestaObj.setIdRuleta(ru.getId());
 			apuestaObj.setGanador("Visistante");
 			apuestaObj.setPremio(apuesta*2);
+			apuestaObj.setRuleta(ru);
 			save(apuestaObj);
 			return new ResponseEntity<>("Ganaste: "+ apuesta*2,HttpStatus.OK);
 		   }else {
-			    apuestaObj.setIdRuleta(ru.getId());
-				apuestaObj.setGanador("Casa");
+			    apuestaObj.setGanador("Casa");
 				apuestaObj.setPremio(apuesta);
+				apuestaObj.setRuleta(ru);
 				save(apuestaObj);
 			   ru.setGanacia(apuesta+ru.getGanacia());
 			   return new ResponseEntity<>("Perdiste",HttpStatus.OK);
