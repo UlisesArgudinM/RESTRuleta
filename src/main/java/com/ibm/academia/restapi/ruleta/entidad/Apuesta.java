@@ -3,6 +3,7 @@ package com.ibm.academia.restapi.ruleta.entidad;
 import java.io.Serializable;
 import java.util.Date;
 
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -18,47 +19,53 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "ruletas",schema = "Casino")
-@Setter
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Ruleta implements Serializable
+@Table(name= "apuestas",schema = "Casino")
+public class Apuesta implements Serializable
 {
-	
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "Id")
-	private long id;
+	private Long id;
 	
-	@Column(name = "Ganancias")
-	private Double ganacia;
+	@Column(name = "id_ruleta")
+	private Long idRuleta;
 	
-	@Column(name = "Estado")
-	private Boolean estado;
+	@Column(name= "fecha_Apuesta")
+	private Date fechaApuesta;
 	
-	@Column(name = "Autor")
-	private String autor;
+	@Column(name="ganador")
+	private String ganador;
 	
-	@Column (name = "fechaCreacion", nullable = false)
-	private Date fechaCreacion;
+	@Column(name="premio")
+	private Double premio;
 	
-
+	
+	
 	
 	@PrePersist
 	private void antesPersistir()
 	{
-		this.fechaCreacion = new Date();
+		this.fechaApuesta = new Date();
 	}
-
-	public Ruleta(long id, Double ganacia, Boolean estado, String autor) {
+	
+	
+	
+	
+	
+	public Apuesta(String ganador, Double premio) {
 		super();
-		this.id = id;
-		this.ganacia = ganacia;
-		this.estado = estado;
-		this.autor = autor;
+		this.ganador = ganador;
+		this.premio = premio;
 	}
 
-	private static final long serialVersionUID = -5413128261886649018L;
+
+
+
+
+	private static final long serialVersionUID = 5897037430824427965L;
+
 }

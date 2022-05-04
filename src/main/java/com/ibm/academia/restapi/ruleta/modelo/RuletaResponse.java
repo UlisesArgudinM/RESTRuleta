@@ -1,6 +1,8 @@
 package com.ibm.academia.restapi.ruleta.modelo;
 
+
 import javax.validation.constraints.NotNull;
+
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,5 +23,6 @@ public class RuletaResponse
 	
 	@NotNull
 	private Boolean estado;
+	
 
 }

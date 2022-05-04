@@ -16,12 +16,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ibm.academia.restapi.ruleta.entidad.Apuesta;
 import com.ibm.academia.restapi.ruleta.entidad.Ruleta;
 import com.ibm.academia.restapi.ruleta.excepcion.BadRequestException;
 import com.ibm.academia.restapi.ruleta.excepcion.NotFoundExcepcion;
 import com.ibm.academia.restapi.ruleta.modelo.Id;
 import com.ibm.academia.restapi.ruleta.modelo.RuletaRequest;
+import com.ibm.academia.restapi.ruleta.modelo.dto.ApuestaDTO;
 import com.ibm.academia.restapi.ruleta.modelo.dto.RuletaDTO;
+import com.ibm.academia.restapi.ruleta.modelo.mapper.ApuestaMapper;
 import com.ibm.academia.restapi.ruleta.modelo.mapper.RuletaMapper;
 import com.ibm.academia.restapi.ruleta.service.IRuletaService;
 
@@ -68,7 +71,13 @@ public class RuletaController
 	@PutMapping("/cerrar")
 	public ResponseEntity<?>clausura(@RequestBody Id id)
 	{
-		return ruletaService.cerrar(id.getId());
+		List<Apuesta> apuestas = ruletaService.cerrar(id.getId());
+		List<ApuestaDTO> apuestaDTO = apuestas.stream().map(ApuestaMapper::mapApuesta).collect(Collectors.toList());
+		if(apuestaDTO.isEmpty())
+		{
+			throw new NotFoundExcepcion("no se encontro a ruleta");
+		}
+		return new ResponseEntity<List<ApuestaDTO>>(apuestaDTO,HttpStatus.OK);
 		
 		
 	}
