@@ -12,7 +12,7 @@ public interface IRuletaService
 {
 	void crearRuleta();
 	ResponseEntity<?> apertura(long id);
-	List<Apuesta> cerrar(long id);
+	ResponseEntity<?> cerrar(long id);
 	ResponseEntity<?>jugar (Ruleta ruleta,Double apuesta,String color,Integer numero);
 	ResponseEntity<?> apuestaColor(Ruleta ru,String color,Double apuesta);
 	ResponseEntity<?> apuestaNumero(Ruleta ru, Integer numero, Double apuesta);

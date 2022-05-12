@@ -1,6 +1,8 @@
 package com.ibm.academia.restapi.ruleta.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.validation.Valid;
@@ -16,15 +18,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ibm.academia.restapi.ruleta.entidad.Apuesta;
 import com.ibm.academia.restapi.ruleta.entidad.Ruleta;
-import com.ibm.academia.restapi.ruleta.excepcion.BadRequestException;
 import com.ibm.academia.restapi.ruleta.excepcion.NotFoundExcepcion;
 import com.ibm.academia.restapi.ruleta.modelo.Id;
 import com.ibm.academia.restapi.ruleta.modelo.RuletaRequest;
-import com.ibm.academia.restapi.ruleta.modelo.dto.ApuestaDTO;
 import com.ibm.academia.restapi.ruleta.modelo.dto.RuletaDTO;
-import com.ibm.academia.restapi.ruleta.modelo.mapper.ApuestaMapper;
 import com.ibm.academia.restapi.ruleta.modelo.mapper.RuletaMapper;
 import com.ibm.academia.restapi.ruleta.service.IRuletaService;
 
@@ -56,8 +54,18 @@ public class RuletaController
 	 * @author Usuario 24/04/22*/
 	
 	@PutMapping("/apertura")
-	public ResponseEntity<?>apertura(@RequestBody Id id)
+	public ResponseEntity<?>apertura(@Valid @RequestBody Id id, BindingResult resultado)
 	{
+		Map<String, Object> validaciones = new HashMap<String,Object>();
+		if(resultado.hasErrors()) {
+		
+		List<String> listaErrores = resultado.getFieldErrors()
+				.stream()
+				.map(errores -> "Campo '" + errores.getField() + "'  " + errores.getDefaultMessage())
+				.collect(Collectors.toList());
+		validaciones.put("Lista Errores", listaErrores);
+		return new ResponseEntity<Map<String, Object>>(validaciones,HttpStatus.BAD_REQUEST);
+		}
 		
 		return ruletaService.apertura(id.getId());
 		
@@ -69,15 +77,20 @@ public class RuletaController
 	 * @author Usuario 24/04/22*/
 	
 	@PutMapping("/cerrar")
-	public ResponseEntity<?>clausura(@RequestBody Id id)
+	public ResponseEntity<?>clausura(@Valid @RequestBody Id id,BindingResult resultado)
 	{
-		List<Apuesta> apuestas = ruletaService.cerrar(id.getId());
-		List<ApuestaDTO> apuestaDTO = apuestas.stream().map(ApuestaMapper::mapApuesta).collect(Collectors.toList());
-		if(apuestaDTO.isEmpty())
-		{
-			throw new NotFoundExcepcion("no se encontro a ruleta if");
+		Map<String, Object> validaciones = new HashMap<String,Object>();
+		if(resultado.hasErrors()) {
+		
+		List<String> listaErrores = resultado.getFieldErrors()
+				.stream()
+				.map(errores -> "Campo '" + errores.getField() + "'  " + errores.getDefaultMessage())
+				.collect(Collectors.toList());
+		validaciones.put("Lista Errores", listaErrores);
+		return new ResponseEntity<Map<String, Object>>(validaciones,HttpStatus.BAD_REQUEST);
 		}
-		return new ResponseEntity<List<ApuestaDTO>>(apuestaDTO,HttpStatus.OK);
+		
+		return ruletaService.cerrar(id.getId());
 		
 		
 	}
@@ -105,11 +118,17 @@ public class RuletaController
 	@PostMapping("/apostar")
 	public ResponseEntity<?>apostar(@Valid @RequestBody RuletaRequest ruletaRequest,BindingResult resultado) throws Exception
 	{
-		
+		Map<String, Object> validaciones = new HashMap<String,Object>();
 		if(resultado.hasErrors()) {
-		throw new BadRequestException("El cuerpo de la peticion no es valido");
+			List<String> listaErrores = resultado.getFieldErrors()
+					.stream()
+					.map(errores -> "Campo '" + errores.getField() + "'  " + errores.getDefaultMessage())
+					.collect(Collectors.toList());
+			validaciones.put("Lista Errores", listaErrores);
+			return new ResponseEntity<Map<String, Object>>(validaciones,HttpStatus.BAD_REQUEST);
+		
 		}
-		Ruleta ruOp = ruletaService.findById(ruletaRequest.getId()).orElseThrow(() -> new NotFoundExcepcion("Datos no encontrados en base de datos"));
+		Ruleta ruOp = ruletaService.findById(ruletaRequest.getId()).orElseThrow(() -> new NotFoundExcepcion("Ruleta no encontrada"));
 		
 		return ruletaService.jugar(ruOp, ruletaRequest.getApuesta(), ruletaRequest.getColor(), ruletaRequest.getNumero());
 		

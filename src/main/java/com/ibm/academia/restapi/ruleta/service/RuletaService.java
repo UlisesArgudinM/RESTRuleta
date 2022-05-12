@@ -4,6 +4,7 @@ package com.ibm.academia.restapi.ruleta.service;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,8 @@ import com.ibm.academia.restapi.ruleta.entidad.Apuesta;
 import com.ibm.academia.restapi.ruleta.entidad.Ruleta;
 import com.ibm.academia.restapi.ruleta.excepcion.BadRequestException;
 import com.ibm.academia.restapi.ruleta.excepcion.NotFoundExcepcion;
+import com.ibm.academia.restapi.ruleta.modelo.dto.ApuestaDTO;
+import com.ibm.academia.restapi.ruleta.modelo.mapper.ApuestaMapper;
 import com.ibm.academia.restapi.ruleta.repositorio.ApuestaRepository;
 import com.ibm.academia.restapi.ruleta.repositorio.RuletaRepository;
 
@@ -61,25 +64,27 @@ public ResponseEntity<?> apertura(long id)
 		return new ResponseEntity<>("Se abrio la Ruleta con id: " + id,HttpStatus.OK);
 	}
 @Override
-public List<Apuesta> cerrar(long id) 
+public ResponseEntity<?> cerrar(long id) 
 	{
-		Ruleta ruletaObj = new Ruleta();
+		Ruleta ruletaObjeto = new Ruleta();
 		if(existsById(id))
 		{
 			Optional<Ruleta> ruletaOptinal = findById(id);
-			ruletaObj = ruletaOptinal.get();
-			if(ruletaObj.getEstado()==true)
+			ruletaObjeto = ruletaOptinal.get();
+			if(ruletaObjeto.getEstado()==true)
 			{
-				ruletaObj.setEstado(false);
+				ruletaObjeto.setEstado(false);
 				
 			}
 				
-			save(ruletaObj);
+			save(ruletaObjeto);
 		} 
 		else {
-			return null;
+			throw new NotFoundExcepcion("no se encontro la ruleta");
 		}
-		return ruletaObj.getApuestas();
+		List<Apuesta> apuestas = ruletaObjeto.getApuestas();
+		List<ApuestaDTO> apuestaDTO = apuestas.stream().map(ApuestaMapper::mapApuesta).collect(Collectors.toList());
+		return new ResponseEntity<List<ApuestaDTO>>(apuestaDTO,HttpStatus.OK);
 	}
 @Override
 public ResponseEntity<?>jugar (Ruleta ruleta,Double apuesta,String color,Integer numero)
@@ -115,28 +120,28 @@ public ResponseEntity<?>jugar (Ruleta ruleta,Double apuesta,String color,Integer
 	
 	
 @Override
-public ResponseEntity<?> apuestaColor(Ruleta ru,String color,Double apuesta)
+public ResponseEntity<?> apuestaColor(Ruleta ruleta,String color,Double apuesta)
 	{
 		Random ran = new Random ();
-		Apuesta apuestaObj = new Apuesta();
+		Apuesta apuestaObjeto = new Apuesta();
 		int resultado = ran.nextInt(36 + 0) + 0;
 		
 			if(color.compareToIgnoreCase("rojo")==0)
 			{
 				if(resultado>=0 && resultado<=18)
 				{
-					apuestaObj.setGanador("Visistante");
-					apuestaObj.setPremio(apuesta*2);
-					apuestaObj.setRuleta(ru);
-					save(apuestaObj);
+					apuestaObjeto.setGanador("Visistante");
+					apuestaObjeto.setPremio(apuesta*2);
+					apuestaObjeto.setRuleta(ruleta);
+					save(apuestaObjeto);
 					return new ResponseEntity<>("Ganaste: "+ apuesta*2,HttpStatus.OK);
 					
 				}else {
-					apuestaObj.setGanador("Casa");
-					apuestaObj.setPremio(apuesta);
-					apuestaObj.setRuleta(ru);
-					save(apuestaObj);
-					ru.setGanacia(apuesta+ru.getGanacia());
+					apuestaObjeto.setGanador("Casa");
+					apuestaObjeto.setPremio(apuesta);
+					apuestaObjeto.setRuleta(ruleta);
+					save(apuestaObjeto);
+					ruleta.setGanacia(apuesta+ruleta.getGanacia());
 					return new ResponseEntity<>("Perdiste",HttpStatus.OK);
 					
 				}
@@ -148,17 +153,17 @@ public ResponseEntity<?> apuestaColor(Ruleta ru,String color,Double apuesta)
 			{
 				if(resultado>=19 && resultado<=36)
 				{
-					apuestaObj.setGanador("Visistante");
-					apuestaObj.setPremio(apuesta*2);
-					apuestaObj.setRuleta(ru);
-					save(apuestaObj);
+					apuestaObjeto.setGanador("Visistante");
+					apuestaObjeto.setPremio(apuesta*2);
+					apuestaObjeto.setRuleta(ruleta);
+					save(apuestaObjeto);
 					return new ResponseEntity<>("Ganaste: "+ apuesta*2,HttpStatus.OK);
 				}else {
-					apuestaObj.setGanador("Casa");
-					apuestaObj.setPremio(apuesta);
-					apuestaObj.setRuleta(ru);
-					save(apuestaObj);
-					ru.setGanacia(apuesta+ru.getGanacia());
+					apuestaObjeto.setGanador("Casa");
+					apuestaObjeto.setPremio(apuesta);
+					apuestaObjeto.setRuleta(ruleta);
+					save(apuestaObjeto);
+					ruleta.setGanacia(apuesta+ruleta.getGanacia());
 					return new ResponseEntity<>("Perdiste"+ apuesta*2,HttpStatus.OK);
 				}
 			}
@@ -167,26 +172,26 @@ public ResponseEntity<?> apuestaColor(Ruleta ru,String color,Double apuesta)
 	}
 	
 @Override
-public ResponseEntity<?> apuestaNumero(Ruleta ru, Integer numero, Double apuesta) 
+public ResponseEntity<?> apuestaNumero(Ruleta ruleta, Integer numero, Double apuesta) 
 	{
 		Random ran = new Random ();
-		Apuesta apuestaObj= new Apuesta();
+		Apuesta apuestaObjeto= new Apuesta();
 		int resultado = ran.nextInt(36 + 0) + 0;
 		if(numero<=36 && numero>=0)
 		{
 		if(resultado==numero)	
 		   {
-			apuestaObj.setGanador("Visistante");
-			apuestaObj.setPremio(apuesta*2);
-			apuestaObj.setRuleta(ru);
-			save(apuestaObj);
+			apuestaObjeto.setGanador("Visistante");
+			apuestaObjeto.setPremio(apuesta*2);
+			apuestaObjeto.setRuleta(ruleta);
+			save(apuestaObjeto);
 			return new ResponseEntity<>("Ganaste: "+ apuesta*2,HttpStatus.OK);
 		   }else {
-			    apuestaObj.setGanador("Casa");
-				apuestaObj.setPremio(apuesta);
-				apuestaObj.setRuleta(ru);
-				save(apuestaObj);
-			   ru.setGanacia(apuesta+ru.getGanacia());
+			    apuestaObjeto.setGanador("Casa");
+				apuestaObjeto.setPremio(apuesta);
+				apuestaObjeto.setRuleta(ruleta);
+				save(apuestaObjeto);
+			   ruleta.setGanacia(apuesta+ruleta.getGanacia());
 			   return new ResponseEntity<>("Perdiste",HttpStatus.OK);
 			   
 		   }
@@ -200,7 +205,7 @@ public ResponseEntity<?> apuestaNumero(Ruleta ru, Integer numero, Double apuesta
 	{
         return ruletaRepository.findAll();
     }
-	
+	@Transactional(readOnly = true)
 	public List<Apuesta> listApuesta()
 	{
         return apuestaRepository.findAll();
