@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ibm.academia.restapi.ruleta.entidad.Ruleta;
 import com.ibm.academia.restapi.ruleta.excepcion.NotFoundExcepcion;
-import com.ibm.academia.restapi.ruleta.modelo.Id;
+import com.ibm.academia.restapi.ruleta.modelo.IdRequest;
 import com.ibm.academia.restapi.ruleta.modelo.RuletaRequest;
 import com.ibm.academia.restapi.ruleta.modelo.dto.RuletaDTO;
 import com.ibm.academia.restapi.ruleta.modelo.mapper.RuletaMapper;
@@ -54,7 +54,7 @@ public class RuletaController
 	 * @author Usuario 24/04/22*/
 	
 	@PutMapping("/apertura")
-	public ResponseEntity<?>apertura(@Valid @RequestBody Id id, BindingResult resultado)
+	public ResponseEntity<?>apertura(@Valid @RequestBody IdRequest id, BindingResult resultado)
 	{
 		Map<String, Object> validaciones = new HashMap<String,Object>();
 		if(resultado.hasErrors()) {
@@ -77,7 +77,7 @@ public class RuletaController
 	 * @author Usuario 24/04/22*/
 	
 	@PutMapping("/cerrar")
-	public ResponseEntity<?>clausura(@Valid @RequestBody Id id,BindingResult resultado)
+	public ResponseEntity<?>clausura(@Valid @RequestBody IdRequest id,BindingResult resultado)
 	{
 		Map<String, Object> validaciones = new HashMap<String,Object>();
 		if(resultado.hasErrors()) {
@@ -116,7 +116,7 @@ public class RuletaController
 	 * @throws NotFoundExcepcion **/
 	
 	@PostMapping("/apostar")
-	public ResponseEntity<?>apostar(@Valid @RequestBody RuletaRequest ruletaRequest,BindingResult resultado) throws Exception
+	public ResponseEntity<?>apostar(@Valid @RequestBody RuletaRequest ruletaRequest,BindingResult resultado) 
 	{
 		Map<String, Object> validaciones = new HashMap<String,Object>();
 		if(resultado.hasErrors()) {

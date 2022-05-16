@@ -44,7 +44,7 @@ public void crearRuleta()
 		
 	}
 @Override	
-public ResponseEntity<?> apertura(long id)
+public ResponseEntity<?> apertura(Long id)
 	{
 		Ruleta ruletaObj = new Ruleta();
 		if(existsById(id))
@@ -64,7 +64,7 @@ public ResponseEntity<?> apertura(long id)
 		return new ResponseEntity<>("Se abrio la Ruleta con id: " + id,HttpStatus.OK);
 	}
 @Override
-public ResponseEntity<?> cerrar(long id) 
+public ResponseEntity<?> cerrar(Long id) 
 	{
 		Ruleta ruletaObjeto = new Ruleta();
 		if(existsById(id))
@@ -95,7 +95,7 @@ public ResponseEntity<?>jugar (Ruleta ruleta,Double apuesta,String color,Integer
 			throw new BadRequestException("No se puede jugar en una mesa fuera de servicio");
 		}
 		
-		if(color.isBlank() && numero!=null)
+		if(!color.isBlank() && numero!=null)
 		{
 			
 			throw new BadRequestException("Solo puede elegir color o Numero");
@@ -212,13 +212,13 @@ public ResponseEntity<?> apuestaNumero(Ruleta ruleta, Integer numero, Double apu
     }
 	@Override
 	@Transactional(readOnly = true)
-	public Optional<Ruleta>findById(long id)
+	public Optional<Ruleta>findById(Long id)
 	{
 		return ruletaRepository.findById(id);
 	}
 	@Override
 	@Transactional(readOnly = true)
-	public Optional<Apuesta>findByIdApuesta(long id)
+	public Optional<Apuesta>findByIdApuesta(Long id)
 	{
 		return apuestaRepository.findById(id);
 	}
@@ -235,14 +235,14 @@ public ResponseEntity<?> apuestaNumero(Ruleta ruleta, Integer numero, Double apu
 	}
 	
 
-	public void delete (long id)
+	public void delete (Long id)
 	{
 		ruletaRepository.deleteById(id);
 	}
 	
 	
 	@Transactional(readOnly = true)
-	public boolean existsById(long id)
+	public boolean existsById(Long id)
 	{
         return ruletaRepository.existsById(id);
     }

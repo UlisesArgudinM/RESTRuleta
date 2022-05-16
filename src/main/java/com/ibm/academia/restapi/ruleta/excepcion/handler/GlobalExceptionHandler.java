@@ -1,5 +1,9 @@
 package com.ibm.academia.restapi.ruleta.excepcion.handler;
 
+
+
+import javax.validation.ValidationException;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -22,6 +26,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> badRequestHandler(BadRequestException e)
     {
     	return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
+    }
+    
+    @ExceptionHandler(ValidationException.class)
+    public ResponseEntity<String> validationHandler(ValidationException exception) 
+    {
+        return new ResponseEntity<>(exception.getMessage(),HttpStatus.BAD_REQUEST);
     }
 
   
