@@ -26,7 +26,7 @@ import com.ibm.academia.restapi.ruleta.repositorio.RuletaRepository;
 public class RuletaService implements IRuletaService
 {
 	
-	@Autowired
+	@Autowired(required = true)
 	RuletaRepository ruletaRepository;
 	
 	@Autowired

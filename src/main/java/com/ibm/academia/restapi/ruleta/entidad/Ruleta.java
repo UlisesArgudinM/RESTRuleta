@@ -33,7 +33,7 @@ public class Ruleta implements Serializable
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "Id")
-	private long id;
+	private Long id;
 	
 	@Column(name = "Ganancias")
 	private Double ganacia;
