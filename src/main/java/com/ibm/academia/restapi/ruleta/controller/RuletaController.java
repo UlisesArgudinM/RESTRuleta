@@ -1,8 +1,6 @@
 package com.ibm.academia.restapi.ruleta.controller;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.validation.Valid;
@@ -19,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ibm.academia.restapi.ruleta.entidad.Ruleta;
+import com.ibm.academia.restapi.ruleta.excepcion.BadRequestException;
 import com.ibm.academia.restapi.ruleta.excepcion.NotFoundExcepcion;
 import com.ibm.academia.restapi.ruleta.modelo.IdRequest;
 import com.ibm.academia.restapi.ruleta.modelo.RuletaRequest;
@@ -54,18 +53,11 @@ public class RuletaController
 	 * @author Usuario 24/04/22*/
 	
 	@PutMapping("/apertura")
-	public ResponseEntity<?>apertura(@Valid @RequestBody IdRequest id, BindingResult resultado)
+	public ResponseEntity<?>apertura(@RequestBody @Valid IdRequest id, BindingResult resultado)
 	{
-		Map<String, Object> validaciones = new HashMap<String,Object>();
-		if(resultado.hasErrors()) {
+		if(id.getId()==null) 
+		throw new BadRequestException("No puede ser nulo");
 		
-		List<String> listaErrores = resultado.getFieldErrors()
-				.stream()
-				.map(errores -> "Campo '" + errores.getField() + "'  " + errores.getDefaultMessage())
-				.collect(Collectors.toList());
-		validaciones.put("Lista Errores", listaErrores);
-		return new ResponseEntity<Map<String, Object>>(validaciones,HttpStatus.BAD_REQUEST);
-		}
 		
 		return ruletaService.apertura(id.getId());
 		
@@ -77,18 +69,11 @@ public class RuletaController
 	 * @author Usuario 24/04/22*/
 	
 	@PutMapping("/cerrar")
-	public ResponseEntity<?>clausura(@Valid @RequestBody IdRequest id,BindingResult resultado)
+	public ResponseEntity<?>clausura(@RequestBody @Valid IdRequest id,BindingResult resultado)
 	{
-		Map<String, Object> validaciones = new HashMap<String,Object>();
-		if(resultado.hasErrors()) {
-		
-		List<String> listaErrores = resultado.getFieldErrors()
-				.stream()
-				.map(errores -> "Campo '" + errores.getField() + "'  " + errores.getDefaultMessage())
-				.collect(Collectors.toList());
-		validaciones.put("Lista Errores", listaErrores);
-		return new ResponseEntity<Map<String, Object>>(validaciones,HttpStatus.BAD_REQUEST);
-		}
+		if(id.getId()==null) 
+		throw new BadRequestException("No puede ser nulo");
+	
 		
 		return ruletaService.cerrar(id.getId());
 		
@@ -116,18 +101,12 @@ public class RuletaController
 	 * @throws NotFoundExcepcion **/
 	
 	@PostMapping("/apostar")
-	public ResponseEntity<?>apostar(@Valid @RequestBody RuletaRequest ruletaRequest,BindingResult resultado) 
+	public ResponseEntity<?>apostar(@RequestBody @Valid RuletaRequest ruletaRequest,BindingResult resultado) 
 	{
-		Map<String, Object> validaciones = new HashMap<String,Object>();
-		if(resultado.hasErrors()) {
-			List<String> listaErrores = resultado.getFieldErrors()
-					.stream()
-					.map(errores -> "Campo '" + errores.getField() + "'  " + errores.getDefaultMessage())
-					.collect(Collectors.toList());
-			validaciones.put("Lista Errores", listaErrores);
-			return new ResponseEntity<Map<String, Object>>(validaciones,HttpStatus.BAD_REQUEST);
-		
-		}
+		if(ruletaRequest.getId()==null || ruletaRequest.getApuesta()==null)
+			throw new BadRequestException("No puede ser nulo el id o la apuesta");
+			
+			
 		Ruleta ruOp = ruletaService.findById(ruletaRequest.getId()).orElseThrow(() -> new NotFoundExcepcion("Ruleta no encontrada"));
 		
 		return ruletaService.jugar(ruOp, ruletaRequest.getApuesta(), ruletaRequest.getColor(), ruletaRequest.getNumero());
